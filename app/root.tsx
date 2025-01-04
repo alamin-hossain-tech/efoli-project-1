@@ -3,12 +3,14 @@ import {
   Links,
   Meta,
   Outlet,
+  redirect,
   Scripts,
   ScrollRestoration,
 } from "react-router";
 
 import type { Route } from "./+types/root";
 import stylesheet from "./app.css?url";
+import { getUser } from "./lib/functions/getUser";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -44,6 +46,27 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 export default function App() {
   return <Outlet />;
+}
+
+export async function loader({ request }: Route.LoaderArgs) {
+  const user = await getUser(request);
+
+  const url = new URL(request.url);
+
+  // Allow public routes (e.g., `/sign-in`, `/register`)
+  if (url.pathname === "/login") {
+    if (user) {
+      throw redirect("/"); // or your default authenticated route
+    }
+    return null;
+  }
+
+  // For all other routes, redirect unauthenticated users
+  if (!user) {
+    throw redirect("/login");
+  }
+
+  return null; // Allow authenticated users to access protected routes
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
