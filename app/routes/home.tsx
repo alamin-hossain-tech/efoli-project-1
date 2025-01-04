@@ -1,12 +1,15 @@
+import { useSubmit } from "react-router";
 import type { Route } from "./+types/home";
 
 export function meta({}: Route.MetaArgs) {
   return [
-    { title: "New React Router App" },
-    { name: "description", content: "Welcome to React Router!" },
+    { title: "Tickets" },
+    { name: "description", content: "Welcome to my app" },
   ];
 }
 
 export default function Home({ loaderData }: Route.ComponentProps) {
-  return <div>Home page</div>;
+  const submit = useSubmit();
+
+  return <div></div>;
 }

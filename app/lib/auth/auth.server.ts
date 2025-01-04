@@ -27,7 +27,7 @@ authenticator.use(
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
-      throw new Error("Invalid credentials");
+      throw new Error("Wrong Password");
     }
     const role: Role = user.role as Role;
 

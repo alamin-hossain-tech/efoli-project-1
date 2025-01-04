@@ -1,21 +1,33 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import bcrypt from "bcryptjs";
+import { Loader2, LockKeyhole, Mail, User } from "lucide-react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import {
+  Link,
   redirect,
   useActionData,
   useNavigation,
   useSubmit,
 } from "react-router";
 import { z } from "zod";
+import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
+import { useToast } from "~/hooks/use-toast";
 import { prisma } from "~/prisma.server";
 
 // Validation schema using Zod
-const schema = z.object({
-  name: z.string().min(1, "Name is required"),
-  email: z.string().email("Invalid email address"),
-  password: z.string().min(8, "Password must be at least 8 characters long"),
-});
+const schema = z
+  .object({
+    name: z.string().min(1, "Name is required"),
+    email: z.string().email("Invalid email address"),
+    password: z.string().min(8, "Password must be at least 8 characters long"),
+    confirmPassword: z.string().min(8, "Confirm password is required"),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
+  });
 
 // SignUp Component
 const SignUpPage = () => {
@@ -37,93 +49,135 @@ const SignUpPage = () => {
     // Process form submission here
     submit(data, { method: "POST" });
   };
-
+  const { toast } = useToast();
   const actionData = useActionData();
+  useEffect(() => {
+    if (actionData?.error) {
+      toast({
+        title: actionData.error,
+        variant: "destructive",
+      });
+    }
+  }, [actionData, toast]);
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
-      <div className="w-full max-w-md bg-white shadow-lg rounded-lg p-6">
-        <h1 className="text-2xl font-semibold text-center mb-6">Sign Up</h1>
-        {actionData?.error && (
-          <p style={{ color: "red" }}>{actionData.error}</p>
-        )}
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <div className="flex h-screen justify-center items-center px-4">
+        <div className="flex flex-col border border-gray-200 p-4 lg:p-5 rounded-lg bg-white min-w-full lg:min-w-[450px] gap-3">
           <div>
-            <label
-              htmlFor="name"
-              className="block text-sm font-medium text-gray-700"
-            >
+            <h4 className="text-2xl font-semibold">Sign Up</h4>
+            <p className="text-gray-2 text-sm">Please create an account</p>
+          </div>
+          <div className="space-y-1">
+            <label htmlFor="name" className="text-gray-1 text-sm">
               Name
             </label>
-            <input
-              id="name"
-              type="text"
-              {...register("name")}
-              className={`mt-1 block w-full px-4 py-2 border ${
-                errors.name ? "border-red-500" : "border-gray-300"
-              } rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500`}
-            />
+            <div className="relative">
+              <Input
+                {...register("name")}
+                id="name"
+                placeholder="John Doe"
+                isError={!!errors.name}
+                className="bg-gray-5 placeholder:text-gray-3 ps-9"
+              />
+              <User className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-3 scale-75" />
+            </div>
             {errors.name && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors?.name?.message}
-              </p>
+              <span className="text-red-500 text-sm">
+                {errors.name.message}
+              </span>
             )}
           </div>
-
-          <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Email
+          <div className="space-y-1">
+            <label htmlFor="email" className="text-gray-1 text-sm">
+              Email address
             </label>
-            <input
-              id="email"
-              type="email"
-              {...register("email")}
-              className={`mt-1 block w-full px-4 py-2 border ${
-                errors.email ? "border-red-500" : "border-gray-300"
-              } rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500`}
-            />
+            <div className="relative">
+              <Input
+                {...register("email")}
+                id="email"
+                placeholder="john@example.com"
+                type="email"
+                isError={!!errors.email}
+                className="bg-gray-5 placeholder:text-gray-3 ps-9"
+              />
+              <Mail className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-3 scale-75" />
+            </div>
             {errors.email && (
-              <p className="text-red-500 text-sm mt-1">
+              <span className="text-red-500 text-sm">
                 {errors.email.message}
-              </p>
+              </span>
             )}
           </div>
-
-          <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-gray-700"
-            >
+          <div className="space-y-1">
+            <label htmlFor="password" className="text-gray-1 text-sm">
               Password
             </label>
-            <input
-              id="password"
-              type="password"
-              {...register("password")}
-              className={`mt-1 block w-full px-4 py-2 border ${
-                errors.password ? "border-red-500" : "border-gray-300"
-              } rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500`}
-            />
+            <div className="relative">
+              <Input
+                {...register("password")}
+                id={"password"}
+                type={"password"}
+                autoComplete="current-password"
+                placeholder="Enter your password"
+                isError={!!errors.password}
+                className="bg-gray-5 placeholder:text-gray-3 ps-9"
+              />
+              <LockKeyhole className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-3 scale-75" />
+            </div>
             {errors.password && (
-              <p className="text-red-500 text-sm mt-1">
+              <span className="text-red-500 text-sm">
                 {errors.password.message}
-              </p>
+              </span>
+            )}
+          </div>
+          <div className="space-y-1">
+            <label htmlFor="confirm" className="text-gray-1 text-sm">
+              Confirm Password
+            </label>
+            <div className="relative">
+              <Input
+                {...register("confirmPassword")}
+                id={"confirm"}
+                type={"password"}
+                autoComplete="current-password"
+                placeholder="Confirm password"
+                isError={!!errors.confirmPassword}
+                className="bg-gray-5 placeholder:text-gray-3 ps-9"
+              />
+              <LockKeyhole className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-3 scale-75" />
+            </div>
+            {errors.confirmPassword && (
+              <span className="text-red-500 text-sm">
+                {errors.confirmPassword.message}
+              </span>
             )}
           </div>
 
-          <button
-            type="submit"
-            className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+          <Button
             disabled={isSubmitting}
+            type="submit"
+            variant={"brand3"}
+            className="mt-2"
           >
-            {isSubmitting ? <>Signing...</> : "Sign Up"}
-          </button>
-        </form>
+            {isSubmitting ? (
+              <>
+                <Loader2 className="animate-spin" />
+                Please wait
+              </>
+            ) : (
+              "Sign Up"
+            )}
+          </Button>
+          <p className="text-gray-2 text-center">
+            Already have an account?{" "}
+            <Link to={"/login"} className="text-brand-3">
+               Sign in
+            </Link>
+          </p>
+        </div>
       </div>
-    </div>
+    </form>
   );
 };
 

@@ -4,7 +4,7 @@
 
 html,
 body {
-  @apply bg-white dark:bg-gray-950;
+  @apply bg-body dark:bg-gray-950 font-manrope;
 
   @media (prefers-color-scheme: dark) {
     color-scheme: dark;
@@ -14,5 +14,8 @@ body {
 @layer base {
   :root {
     --radius: 0.5rem;
+  }
+  p {
+    @apply text-sm;
   }
 }
