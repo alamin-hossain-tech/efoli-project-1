@@ -14,9 +14,9 @@ const MainLayout = ({ loaderData }: Route.ComponentProps) => {
   return (
     <div className="flex items-stretch relative">
       <Sidebar role={role} />
-      <div className="flex-grow ">
+      <div className="flex-grow flex flex-col">
         <Header />
-        <div className="p-5">
+        <div className="p-5 flex-grow max-h-[calc(100%-16)] overflow-y-auto">
           <Outlet />
         </div>
       </div>

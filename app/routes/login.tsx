@@ -61,8 +61,8 @@ const LoginPage = () => {
         <div className="flex h-screen justify-center items-center px-4">
           <div className="flex flex-col border border-gray-200 p-4 lg:p-5 rounded-lg bg-white min-w-full lg:min-w-[450px] gap-3">
             <div>
-              <h4 className="text-2xl font-semibold">Login </h4>
-              <p className="text-gray-2 text-sm">
+              <h4 className="text-3xl font-semibold mb-1 ">Login </h4>
+              <p className="text-gray-2 text-md">
                 Enter your email & password to login
               </p>
             </div>

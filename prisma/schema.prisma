@@ -8,42 +8,51 @@ datasource db {
 }
 
 model User {
-  id              Int       @id @default(autoincrement())
-  email           String    @unique
+  id              Int              @id @default(autoincrement())
+  email           String           @unique
   password        String
   name            String
-  createdAt       DateTime  @default(now())
-  role            Role      @default(CUSTOMER)
+  createdAt       DateTime         @default(now())
+  role            Role             @default(CUSTOMER)
   messages        Message[]
-  assignedTickets Ticket[]  @relation("AssignedTickets")
-  tickets         Ticket[]  @relation("UserTickets")
+  Ticket          Ticket[]         @relation("CustomerTickets")
+  assignedTickets TicketAssignee[]
 }
 
 model Ticket {
-  id         Int          @id @default(autoincrement())
+  id         Int              @id @default(autoincrement())
+  autoGenId  String           @unique 
   subject    String
-  createdAt  DateTime     @default(now())
-  updatedAt  DateTime     @updatedAt
-  status     TicketStatus @default(OPEN)
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+  status     TicketStatus     @default(OPEN)
   customerId Int
-  adminId    Int
   messages   Message[]
-  admin      User         @relation("AssignedTickets", fields: [adminId], references: [id])
-  customer   User         @relation("UserTickets", fields: [customerId], references: [id])
+  customer   User             @relation("CustomerTickets", fields: [customerId], references: [id])
+  assignees  TicketAssignee[]
 
-  @@index([adminId], map: "Ticket_adminId_fkey")
   @@index([customerId], map: "Ticket_customerId_fkey")
+}
+
+model TicketAssignee {
+  id       Int    @id @default(autoincrement())
+  ticketId Int
+  adminId  Int
+  admin    User   @relation(fields: [adminId], references: [id])
+  ticket   Ticket @relation(fields: [ticketId], references: [id])
+
+  @@unique([ticketId, adminId])
+  @@index([adminId], map: "TicketAssignee_adminId_fkey")
 }
 
 model Message {
   id        Int      @id @default(autoincrement())
-  message   String
+    message   String   @db.Text   // Change this from String to TEXT
   createdAt DateTime @default(now())
   ticketId  Int
   userId    Int
   ticket    Ticket   @relation(fields: [ticketId], references: [id])
   user      User     @relation(fields: [userId], references: [id])
-
   @@index([ticketId], map: "Message_ticketId_fkey")
   @@index([userId], map: "Message_userId_fkey")
 }
@@ -58,3 +67,4 @@ enum TicketStatus {
   SOLVED
   CLOSED
 }
+
