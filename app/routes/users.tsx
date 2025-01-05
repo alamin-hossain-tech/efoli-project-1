@@ -80,7 +80,7 @@ const UsersPage = ({ loaderData }: Route.ComponentProps) => {
                       <TableCell>{user.name}</TableCell>
                       <TableCell>{user.email}</TableCell>
                       <TableCell className="text-right">
-                        {moment(user.createdAt).format("DD MMM, YYYY, hh:mm A")}
+                        {moment(user.createdAt).format("DD MMM, YYYY hh:mm A")}
                       </TableCell>
                     </TableRow>
                   ))

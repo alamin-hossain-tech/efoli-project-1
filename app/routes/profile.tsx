@@ -11,6 +11,7 @@ const ProfilePage = ({ loaderData }: Route.ComponentProps) => {
           <AvatarFallback>{getShortName(user.name)}</AvatarFallback>
         </Avatar>
         <p>Name: {user.name}</p>
+        <p>Email: {user.email}</p>
       </div>
     </div>
   );

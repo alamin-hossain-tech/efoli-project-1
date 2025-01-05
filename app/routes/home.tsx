@@ -1,6 +1,10 @@
-import { Link, useNavigate, useSearchParams } from "react-router";
-import { Button } from "~/components/ui/button";
 import _ from "lodash";
+import { Search } from "lucide-react";
+import { useMemo, useState } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router";
+import { Badge } from "~/components/ui/badge";
+import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
 import {
   Table,
   TableBody,
@@ -12,10 +16,7 @@ import {
 import { getUser } from "~/lib/functions/getUser";
 import { prisma } from "~/prisma.server";
 import type { Route } from "./+types/home";
-import { Input } from "~/components/ui/input";
-import { Search } from "lucide-react";
-import { Badge } from "~/components/ui/badge";
-import { useMemo, useState } from "react";
+import moment from "moment";
 // Ensure you have Prisma set up
 
 export function meta({}: Route.MetaArgs) {
@@ -132,7 +133,9 @@ export default function Home({ loaderData }: Route.ComponentProps) {
                         <Badge variant={ticket.status}>{ticket.status}</Badge>
                       </TableCell>
                       <TableCell className="text-right">
-                        {new Date(ticket.createdAt).toLocaleString()}
+                        {moment(ticket.createdAt).format(
+                          "DD MMM, YYYY hh:mm A"
+                        )}
                       </TableCell>
                     </TableRow>
                   ))
