@@ -9,7 +9,7 @@ export default [
   layout("layouts/main-layout.tsx", [
     index("routes/home.tsx"),
     route("/create-ticket", "routes/create-ticket.tsx"),
-    route("/about", "routes/about.tsx"),
+    route("/view-ticket/:id", "routes/ticket-details.tsx"),
   ]),
   route("/login", "routes/login.tsx"),
   route("/sign-up", "routes/sign-up.tsx"),

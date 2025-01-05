@@ -1,7 +1,13 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { data, useActionData, useNavigation, useSubmit } from "react-router";
+import {
+  data,
+  redirect,
+  useActionData,
+  useNavigation,
+  useSubmit,
+} from "react-router";
 import { z } from "zod";
 import { toast } from "~/hooks/use-toast";
 import { getUser } from "~/lib/functions/getUser";
@@ -162,3 +168,11 @@ export const action = async ({ request }: Route.ActionArgs) => {
     await prisma.$disconnect();
   }
 };
+
+export async function loader({ request }: Route.LoaderArgs) {
+  const user = await getUser(request);
+  if (user.role !== "CUSTOMER") {
+    return redirect("/");
+  }
+  return null;
+}

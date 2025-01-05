@@ -17,7 +17,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           "dark:ring-offset-neutral-950 dark:placeholder:text-neutral-400",
           isError
             ? "ring-2 ring-red-500 focus-visible:ring-red-500 dark:focus-visible:ring-red-500"
-            : "border border-neutral-200 bg-white focus-visible:ring-neutral-950 dark:border-neutral-800 dark:bg-neutral-950 dark:focus-visible:ring-neutral-300",
+            : "border border-neutral-200 bg-white focus-visible:ring-brand-1 dark:border-neutral-800 dark:bg-neutral-950 dark:focus-visible:ring-neutral-300",
           className
         )}
         ref={ref}
