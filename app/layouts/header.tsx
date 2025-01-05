@@ -9,7 +9,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "~/components/ui/alert-dialog";
 import { Avatar, AvatarFallback } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
@@ -21,6 +20,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
+import { getShortName } from "~/lib/functions/getShortName";
 
 const Header = ({ userName }: { userName: string }) => {
   const submit = useSubmit();
@@ -33,17 +33,6 @@ const Header = ({ userName }: { userName: string }) => {
       setTitle(document?.title);
     }
   }, [location]);
-
-  function getShortName(name: string): string {
-    const words = name.split(/[\s-]+/); // Split name by spaces or hyphens
-    if (words.length === 1) {
-      return words[0].charAt(0).toUpperCase(); // Return the initial of the single word
-    }
-    return (
-      words[0].charAt(0).toUpperCase() + // First word's initial
-      words[words.length - 1].charAt(0).toUpperCase() // Last word's initial
-    );
-  }
 
   return (
     <div className="h-16 bg-white w-full sticky top-0 left-0 px-5 flex items-center justify-between">
