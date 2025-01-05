@@ -1,5 +1,6 @@
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate, useSearchParams } from "react-router";
 import { Button } from "~/components/ui/button";
+import _ from "lodash";
 import {
   Table,
   TableBody,
@@ -14,6 +15,7 @@ import type { Route } from "./+types/home";
 import { Input } from "~/components/ui/input";
 import { Search } from "lucide-react";
 import { Badge } from "~/components/ui/badge";
+import { useMemo, useState } from "react";
 // Ensure you have Prisma set up
 
 export function meta({}: Route.MetaArgs) {
@@ -30,6 +32,34 @@ export default function Home({ loaderData }: Route.ComponentProps) {
   const handleRoute = (id: number) => {
     navigate(`/view-ticket/${id}`);
   };
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const [searchQuery, setSearchQuery] = useState(
+    searchParams.get("search") || ""
+  );
+
+  // Memoized debounced function
+  const debouncedSearch = useMemo(
+    () =>
+      _.debounce((query: string) => {
+        setSearchParams({ search: query }); // Update URL with the search query
+      }, 300),
+    [setSearchParams]
+  );
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const query = e.target.value;
+    setSearchQuery(query); // Update local state
+    debouncedSearch(query); // Call debounced function
+  };
+
+  const [selectedStatus, setSelectedStatus] = useState("");
+
+  const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const status = e.target.value;
+    setSelectedStatus(status); // Update local state
+    setSearchParams({ search: searchQuery, status: status }); // Update URL with the selected status
+  };
 
   return (
     <div className="flex flex-col h-full">
@@ -39,12 +69,32 @@ export default function Home({ loaderData }: Route.ComponentProps) {
       <div className="border flex-grow bg-white rounded-md">
         {/* Top Part */}
         <div className="flex items-center justify-between p-3 border-b">
-          <div>
+          <div className="flex items-center gap-2">
             <div className="relative">
-              <Input />
+              <Input
+                placeholder="Search tickets..."
+                value={searchQuery}
+                onChange={handleSearchChange}
+                className="pl-8 min-w-96"
+              />
               <Search className="text-gray-3 scale-75 absolute left-2 top-1/2 -translate-y-1/2" />
             </div>
+            <div>
+              <select
+                value={selectedStatus}
+                onChange={handleStatusChange}
+                className="w-full min-w-min border rounded-md p-2 text-sm focus-visible:outline-brand-1 ml-4 "
+              >
+                <option value="">Select Status</option>
+                <option value="OPEN">Open</option>
+                <option value="CLOSED">Closed</option>
+                <option value="SOLVED">Solved</option>
+                {/* Add more statuses if needed */}
+              </select>
+            </div>
           </div>
+          {/* Status Filter */}
+
           {role === "CUSTOMER" && (
             <div>
               <Button asChild>
@@ -102,18 +152,73 @@ export default function Home({ loaderData }: Route.ComponentProps) {
   );
 }
 
+// export async function loader({ request }: Route.LoaderArgs) {
+//   const user = await getUser(request);
+
+//   const url = new URL(request.url);
+//   const searchQuery = url.searchParams.get("search") || "";
+
+//   // Fetch tickets based on user role
+//   let tickets: Ticket[] = [];
+//   if (user.role === "ADMIN") {
+//     // Admin can see all tickets
+//     tickets = await prisma.ticket.findMany({
+//       where: {
+//         OR: [
+//           { subject: { contains: searchQuery } },
+//           { autoGenId: { contains: searchQuery } },
+//         ],
+//       },
+//     });
+//   } else if (user.role === "CUSTOMER") {
+//     // Customer can see only their tickets
+//     tickets = await prisma.ticket.findMany({
+//       where: {
+//         customerId: user.id,
+//         OR: [
+//           { subject: { contains: searchQuery } },
+//           { autoGenId: { contains: searchQuery } },
+//         ],
+//       },
+//     });
+//   }
+
+//   return { tickets, role: user.role };
+// }
+
 export async function loader({ request }: Route.LoaderArgs) {
   const user = await getUser(request);
+  const url = new URL(request.url);
+  const searchQuery = url.searchParams.get("search") || "";
+  const statusFilter = url.searchParams.get("status") || "";
 
-  // Fetch tickets based on user role
+  // Build filter conditions
+  let filterConditions: any = {
+    OR: [
+      { subject: { contains: searchQuery } },
+      { autoGenId: { contains: searchQuery } },
+    ],
+  };
+
+  // Add status filter if provided
+  if (statusFilter) {
+    filterConditions.status = statusFilter;
+  }
+
+  // Fetch tickets based on user role and the filter conditions
   let tickets: Ticket[] = [];
   if (user.role === "ADMIN") {
     // Admin can see all tickets
-    tickets = await prisma.ticket.findMany();
+    tickets = await prisma.ticket.findMany({
+      where: filterConditions,
+    });
   } else if (user.role === "CUSTOMER") {
     // Customer can see only their tickets
     tickets = await prisma.ticket.findMany({
-      where: { customerId: user.id },
+      where: {
+        customerId: user.id,
+        ...filterConditions,
+      },
     });
   }
 

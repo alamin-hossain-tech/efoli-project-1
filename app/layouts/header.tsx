@@ -1,6 +1,6 @@
-import { LogOut, User } from "lucide-react";
+import { LogOut, MenuIcon, User } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useLocation, useSubmit } from "react-router";
+import { Link, useLocation, useSubmit } from "react-router";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -20,13 +20,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
+import { Sheet, SheetContent, SheetTrigger } from "~/components/ui/sheet";
 import { getShortName } from "~/lib/functions/getShortName";
+import Sidebar from "./side-bar";
 
-const Header = ({ userName }: { userName: string }) => {
+const Header = ({ userName, role }: { userName: string; role: Role }) => {
   const submit = useSubmit();
 
   const [title, setTitle] = useState("");
   const [open, setOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
   useEffect(() => {
     if (document) {
@@ -36,6 +39,22 @@ const Header = ({ userName }: { userName: string }) => {
 
   return (
     <div className="h-16 bg-white w-full sticky top-0 left-0 px-5 flex items-center justify-between z-10">
+      <div className="flex-shrink-0 md:hidden">
+        <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
+          <SheetTrigger asChild>
+            <Button variant={"outline"} size={"icon"}>
+              <MenuIcon />
+            </Button>
+          </SheetTrigger>
+          <SheetContent
+            side={"left"}
+            className="w-[64-1px] border-r-0 p-0"
+            onClick={() => setMenuOpen(false)}
+          >
+            <Sidebar role={role} />
+          </SheetContent>
+        </Sheet>
+      </div>
       <p className="text-xl">{title}</p>
 
       <DropdownMenu>
@@ -49,8 +68,10 @@ const Header = ({ userName }: { userName: string }) => {
         <DropdownMenuContent>
           <DropdownMenuLabel>My Account</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>
-            <User /> Profile
+          <DropdownMenuItem asChild>
+            <Link to={"/profile"}>
+              <User /> Profile
+            </Link>
           </DropdownMenuItem>
           <DropdownMenuItem
             className="cursor-pointer"

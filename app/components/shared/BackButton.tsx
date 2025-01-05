@@ -4,7 +4,7 @@ import { Button } from "../ui/button";
 
 const BackButton = () => {
   return (
-    <Button variant={"outline"} size={"icon"} asChild>
+    <Button className="flex-shrink-0" variant={"outline"} size={"icon"} asChild>
       <Link to={-1 as To}>
         <ChevronLeft />
       </Link>

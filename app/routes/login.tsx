@@ -27,8 +27,8 @@ type LoginSchema = z.infer<typeof loginSchema>;
 const LoginPage = () => {
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
-  const actionData = useActionData();
   const [showPassword, setShowPassword] = useState(false);
+  const actionData = useActionData();
   const { toast } = useToast();
   useEffect(() => {
     if (actionData?.error) {

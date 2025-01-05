@@ -14,9 +14,11 @@ const MainLayout = ({ loaderData }: Route.ComponentProps) => {
   const userName = loaderData?.name;
   return (
     <div className="flex items-stretch relative">
-      <Sidebar role={role} />
+      <div className="hidden md:block">
+        <Sidebar role={role} />
+      </div>
       <div className="flex-grow flex flex-col">
-        <Header userName={userName} />
+        <Header userName={userName} role={role} />
         <div className="p-5 flex-grow max-h-[calc(100%-16)] overflow-y-auto">
           <Outlet />
         </div>
