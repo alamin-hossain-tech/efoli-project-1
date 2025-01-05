@@ -4,7 +4,7 @@
 
 ### Installation
 
-## Setting Up the .env File
+### Setting Up the .env File
 
 Add the following to your .env file, replacing root, orange123, localhost, and project_1 with your MySQL database credentials:
 
@@ -12,7 +12,7 @@ Add the following to your .env file, replacing root, orange123, localhost, and p
 DATABASE_URL="mysql://root:orange123@localhost:3306/project_1"
 ```
 
-## Importing the MySQL Backup
+### Importing the MySQL Backup
 
 The backup file is available in the repository under the name project-1.mysql.
 
