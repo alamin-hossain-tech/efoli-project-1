@@ -15,6 +15,11 @@ import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { useToast } from "~/hooks/use-toast";
 import { prisma } from "~/prisma.server";
+import type { Route } from "./+types/sign-up";
+
+export function meta({}: Route.MetaArgs) {
+  return [{ title: "Sign Up" }];
+}
 
 // Validation schema using Zod
 const schema = z

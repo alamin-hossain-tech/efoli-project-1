@@ -12,10 +12,14 @@ import {
 import { z } from "zod";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
+import { useToast } from "~/hooks/use-toast";
 import { authenticator } from "~/lib/auth/auth.server";
 import { sessionStorage } from "~/lib/auth/session.server";
 import type { Route } from "./+types/login";
-import { useToast } from "~/hooks/use-toast";
+
+export function meta({}: Route.MetaArgs) {
+  return [{ title: "Login" }];
+}
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),

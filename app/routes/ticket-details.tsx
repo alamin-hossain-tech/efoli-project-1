@@ -1,23 +1,27 @@
-import { useEffect, useState } from "react";
+import moment from "moment";
+import { useEffect } from "react";
 import { data, Form, useActionData } from "react-router";
 import BackButton from "~/components/shared/BackButton";
+import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { getUser } from "~/lib/functions/getUser";
 import { prisma } from "~/prisma.server";
 import type { Route } from "./+types/ticket-details";
-import { Badge } from "~/components/ui/badge";
-import moment from "moment";
 
+import { Avatar, AvatarFallback } from "~/components/ui/avatar";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "~/components/ui/tooltip";
-import { Avatar, AvatarFallback } from "~/components/ui/avatar";
-import { getShortName } from "~/lib/functions/getShortName";
-import { getMessageTime } from "~/lib/functions/getMessageTime";
 import { useToast } from "~/hooks/use-toast";
+import { getMessageTime } from "~/lib/functions/getMessageTime";
+import { getShortName } from "~/lib/functions/getShortName";
+
+export function meta({}: Route.MetaArgs) {
+  return [{ title: "Ticket Details" }];
+}
 
 const TicketDetailsPage = ({ loaderData }: Route.ComponentProps) => {
   const ticket = loaderData.ticket;

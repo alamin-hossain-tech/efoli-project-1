@@ -2,7 +2,7 @@ import _ from "lodash";
 import { Search } from "lucide-react";
 import moment from "moment";
 import { useMemo, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router";
+import { useSearchParams } from "react-router";
 import { Input } from "~/components/ui/input";
 import {
   Table,
@@ -15,6 +15,10 @@ import {
 import { getUser } from "~/lib/functions/getUser";
 import { prisma } from "~/prisma.server";
 import type { Route } from "./+types/users";
+
+export function meta({}: Route.MetaArgs) {
+  return [{ title: "Users" }];
+}
 
 const UsersPage = ({ loaderData }: Route.ComponentProps) => {
   const users = loaderData;

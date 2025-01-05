@@ -9,13 +9,17 @@ import {
   useSubmit,
 } from "react-router";
 import { z } from "zod";
+import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
+import { Textarea } from "~/components/ui/textarea";
 import { toast } from "~/hooks/use-toast";
 import { getUser } from "~/lib/functions/getUser";
 import { prisma } from "~/prisma.server";
 import type { Route } from "./+types/create-ticket";
-import { Input } from "~/components/ui/input";
-import { Textarea } from "~/components/ui/textarea";
-import { Button } from "~/components/ui/button";
+
+export function meta({}: Route.MetaArgs) {
+  return [{ title: "Create Ticket" }];
+}
 
 export const ticketSchema = z.object({
   subject: z

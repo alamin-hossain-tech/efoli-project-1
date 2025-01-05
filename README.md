@@ -30,6 +30,22 @@ Start the development server with HMR:
 npm run dev
 ```
 
+## Login Credentials
+
+#### Admin:
+
+```
+admin@admin.com
+12341234
+```
+
+#### Customer
+
+```
+alamin@gmail.com
+12341234
+```
+
 Application will be available at `http://localhost:5173`.
 
 ## Building for Production

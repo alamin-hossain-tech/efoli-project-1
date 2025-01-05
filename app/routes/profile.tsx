@@ -1,7 +1,10 @@
-import { getUser } from "~/lib/functions/getUser";
-import type { Route } from "./+types/profile";
 import { Avatar, AvatarFallback } from "~/components/ui/avatar";
 import { getShortName } from "~/lib/functions/getShortName";
+import { getUser } from "~/lib/functions/getUser";
+import type { Route } from "./+types/profile";
+export function meta({}: Route.MetaArgs) {
+  return [{ title: "Profile" }];
+}
 const ProfilePage = ({ loaderData }: Route.ComponentProps) => {
   const user = loaderData;
   return (
