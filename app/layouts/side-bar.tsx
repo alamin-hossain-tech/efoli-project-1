@@ -1,5 +1,5 @@
 import { Ticket, Users } from "lucide-react";
-import { NavLink } from "react-router";
+import { Link, NavLink } from "react-router";
 import logo from "~/assets/logo/logo.svg";
 const Sidebar = ({ role }: { role: Role }) => {
   const menuItems = [
@@ -26,7 +26,9 @@ const Sidebar = ({ role }: { role: Role }) => {
     <div className="w-64 bg-brand-1 h-full md:h-screen py-4 px-6 sticky flex-shrink-0 left-0 top-0 ">
       {/* logo  */}
       <div>
-        <img src={logo} className="w-20 mx-auto" alt="logo" />
+        <Link to={"/"}>
+          <img src={logo} className="w-20 mx-auto" alt="logo" />
+        </Link>
       </div>
       <div className="text-gray-3 mt-4">
         <p>MENU</p>
