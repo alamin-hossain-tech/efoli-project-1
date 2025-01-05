@@ -35,7 +35,7 @@ const Header = ({ userName }: { userName: string }) => {
   }, [location]);
 
   return (
-    <div className="h-16 bg-white w-full sticky top-0 left-0 px-5 flex items-center justify-between">
+    <div className="h-16 bg-white w-full sticky top-0 left-0 px-5 flex items-center justify-between z-10">
       <p className="text-xl">{title}</p>
 
       <DropdownMenu>

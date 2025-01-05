@@ -8,6 +8,16 @@ import type { Route } from "./+types/ticket-details";
 import { Badge } from "~/components/ui/badge";
 import moment from "moment";
 
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "~/components/ui/tooltip";
+import { Avatar, AvatarFallback } from "~/components/ui/avatar";
+import { getShortName } from "~/lib/functions/getShortName";
+import { getMessageTime } from "~/lib/functions/getMessageTime";
+
 const TicketDetailsPage = ({ loaderData }: Route.ComponentProps) => {
   const ticket = loaderData.ticket;
   const userRole = loaderData.user.role;
@@ -73,18 +83,51 @@ const TicketDetailsPage = ({ loaderData }: Route.ComponentProps) => {
                         : "justify-start"
                     }`}
                   >
-                    <div
-                      className={`${
-                        msg.user.role === userRole
-                          ? "bg-blue-500 text-white"
-                          : "bg-white text-gray-1"
-                      } max-w-[70%] p-4 rounded-md shadow-md`}
-                    >
-                      <p className="font-semibold">{msg.user.name}</p>
-                      <p>{msg.message}</p>
-                      <p className="text-xs text-gray-300 mt-2">
-                        {new Date(msg.createdAt).toLocaleString()}
-                      </p>
+                    <div>
+                      <div
+                        className={`flex items-start gap-2 ${
+                          msg.user.role === userRole ? "flex-row-reverse" : ""
+                        }`}
+                      >
+                        <TooltipProvider delayDuration={100}>
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <Avatar
+                                className={`${
+                                  msg.user.role === userRole
+                                    ? "bg-blue-500 text-white "
+                                    : "bg-white text-gray-1"
+                                }shadow-md`}
+                              >
+                                <AvatarFallback
+                                  className={`${
+                                    msg.user.role === userRole
+                                      ? "bg-blue-500 text-white "
+                                      : "bg-white text-gray-1"
+                                  }shadow-md`}
+                                >
+                                  {getShortName(msg.user.name)}
+                                </AvatarFallback>
+                              </Avatar>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p className="font-semibold">{msg.user.name}</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                        <div
+                          className={`${
+                            msg.user.role === userRole
+                              ? "bg-blue-500 text-white"
+                              : "bg-white text-gray-1"
+                          } max-w-[70%] p-4 rounded-md shadow-md`}
+                        >
+                          <p>{msg.message}</p>
+                          <p className="text-xs text-gray-300 mt-2">
+                            {getMessageTime(msg.createdAt)}
+                          </p>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -92,20 +135,26 @@ const TicketDetailsPage = ({ loaderData }: Route.ComponentProps) => {
             </div>
 
             {/* Reply to Message */}
-            <Form method="post" className="space-y-4">
-              <input type="hidden" name="actionType" value="reply" />
-              <textarea
-                name="message"
-                id="message"
-                value={reply}
-                onChange={(e) => setReply(e.target.value)}
-                className="w-full border rounded-md p-2"
-                rows={4}
-                placeholder="Write your reply..."
-                required
-              />
-              <Button type="submit">Reply</Button>
-            </Form>
+            {ticket.status === "OPEN" ? (
+              <Form method="post" className="space-y-4">
+                <input type="hidden" name="actionType" value="reply" />
+                <textarea
+                  name="message"
+                  id="message"
+                  value={reply}
+                  onChange={(e) => setReply(e.target.value)}
+                  className="w-full border rounded-md p-2"
+                  rows={4}
+                  placeholder="Write your reply..."
+                  required
+                />
+                <Button type="submit">Reply</Button>
+              </Form>
+            ) : (
+              <p className="p-3 bg-green-300 text-center">
+                Ticket Marked as {ticket.status}
+              </p>
+            )}
           </div>
         </div>
       </div>

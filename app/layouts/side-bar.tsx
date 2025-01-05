@@ -22,7 +22,7 @@ const Sidebar = ({ role }: { role: Role }) => {
       : []),
   ];
   return (
-    <div className="w-64 bg-brand-1 h-screen py-4 px-6 sticky left-0 top-0 ">
+    <div className="w-64 bg-brand-1 h-screen py-4 px-6 sticky flex-shrink-0 left-0 top-0 ">
       {/* logo  */}
       <div>
         <img src={logo} className="w-20 mx-auto" alt="logo" />
