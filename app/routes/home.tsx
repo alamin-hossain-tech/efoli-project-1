@@ -195,7 +195,6 @@ export async function loader({ request }: Route.LoaderArgs) {
   const searchQuery = url.searchParams.get("search") || "";
   const statusFilter = url.searchParams.get("status") || "";
 
-  // Build filter conditions
   let filterConditions: any = {
     OR: [
       { subject: { contains: searchQuery } },
@@ -203,25 +202,23 @@ export async function loader({ request }: Route.LoaderArgs) {
     ],
   };
 
-  // Add status filter if provided
   if (statusFilter) {
     filterConditions.status = statusFilter;
   }
 
-  // Fetch tickets based on user role and the filter conditions
   let tickets: Ticket[] = [];
   if (user.role === "ADMIN") {
-    // Admin can see all tickets
     tickets = await prisma.ticket.findMany({
       where: filterConditions,
+      orderBy: { createdAt: "asc" },
     });
   } else if (user.role === "CUSTOMER") {
-    // Customer can see only their tickets
     tickets = await prisma.ticket.findMany({
       where: {
         customerId: user.id,
         ...filterConditions,
       },
+      orderBy: { createdAt: "asc" },
     });
   }
 
