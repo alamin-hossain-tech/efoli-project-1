@@ -208,7 +208,6 @@ const TicketDetailsPage = ({ loaderData }: Route.ComponentProps) => {
                   required
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && !e.shiftKey) {
-                      e.preventDefault(); // Prevent default behavior of adding a new line
                       submit(
                         { actionType: "reply", message: reply },
                         { method: "post" }
