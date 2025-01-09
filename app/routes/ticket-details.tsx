@@ -1,6 +1,6 @@
 import moment from "moment";
-import { useEffect } from "react";
-import { data, Form, useActionData } from "react-router";
+import { useEffect, useState } from "react";
+import { data, Form, useActionData, useSubmit } from "react-router";
 import BackButton from "~/components/shared/BackButton";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
@@ -23,10 +23,46 @@ export function meta({}: Route.MetaArgs) {
   return [{ title: "Ticket Details" }];
 }
 
+export async function action({ request, params }: Route.ActionArgs) {
+  const { id } = params;
+  const formData = await request.formData();
+  const actionType = formData.get("actionType");
+  const user = await getUser(request);
+
+  if (actionType === "reply") {
+    const message = formData.get("message");
+    if (typeof message !== "string" || !message.trim()) {
+      return data({ error: "Message cannot be empty" }, { status: 400 });
+    }
+    // Add a reply
+    await prisma.message.create({
+      data: {
+        message,
+        ticketId: parseInt(id!),
+        userId: user.id, // Replace with the authenticated user's ID
+      },
+    });
+    return { messageSent: true };
+  } else if (actionType === "updateStatus" && user.role !== "CUSTOMER") {
+    const status = formData.get("status") as TicketStatus;
+    if (!["OPEN", "SOLVED", "CLOSED"].includes(String(status))) {
+      return data({ error: "Invalid status" }, { status: 400 });
+    }
+
+    await prisma.ticket.update({
+      where: { id: parseInt(id!) },
+      data: { status },
+    });
+    return { success: true, message: "Status Update Success" };
+  }
+  return { success: false, message: "Something went wrong" };
+}
+
 const TicketDetailsPage = ({ loaderData }: Route.ComponentProps) => {
   const ticket = loaderData.ticket;
   const userRole = loaderData.user.role;
-
+  const [reply, setReply] = useState("");
+  const submit = useSubmit();
   const actionData = useActionData();
   const { toast } = useToast();
   useEffect(() => {
@@ -42,7 +78,11 @@ const TicketDetailsPage = ({ loaderData }: Route.ComponentProps) => {
         variant: "default",
       });
     }
+    if (actionData?.messageSent) {
+      setReply("");
+    }
   }, [actionData, toast]);
+
   return (
     <>
       <div className="bg-white rounded-lg border mt-3">
@@ -160,12 +200,21 @@ const TicketDetailsPage = ({ loaderData }: Route.ComponentProps) => {
                 <textarea
                   name="message"
                   id="message"
-                  //   value={reply}
-                  //   onChange={(e) => setReply(e.target.value)}
+                  value={reply}
+                  onChange={(e) => setReply(e.target.value)}
                   className="w-full border rounded-md p-2"
                   rows={4}
                   placeholder="Write your reply..."
                   required
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault(); // Prevent default behavior of adding a new line
+                      submit(
+                        { actionType: "reply", message: reply },
+                        { method: "post" }
+                      ); // Submit the form
+                    }
+                  }}
                 />
                 <Button type="submit">Reply</Button>
               </Form>
@@ -203,40 +252,4 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   }
 
   return { ticket, user };
-}
-
-// Action to handle replies and status updates
-export async function action({ request, params }: Route.ActionArgs) {
-  const { id } = params;
-  const formData = await request.formData();
-  const actionType = formData.get("actionType");
-  const user = await getUser(request);
-
-  if (actionType === "reply") {
-    const message = formData.get("message");
-    if (typeof message !== "string" || !message.trim()) {
-      return data({ error: "Message cannot be empty" }, { status: 400 });
-    }
-    // Add a reply
-    await prisma.message.create({
-      data: {
-        message,
-        ticketId: parseInt(id!),
-        userId: user.id, // Replace with the authenticated user's ID
-      },
-    });
-  } else if (actionType === "updateStatus" && user.role !== "CUSTOMER") {
-    const status = formData.get("status") as TicketStatus;
-    if (!["OPEN", "SOLVED", "CLOSED"].includes(String(status))) {
-      return data({ error: "Invalid status" }, { status: 400 });
-    }
-
-    // Update the ticket status
-    await prisma.ticket.update({
-      where: { id: parseInt(id!) },
-      data: { status },
-    });
-    return { success: true, message: "Status Update Success" };
-  }
-  return { success: false, message: "Something went wrong" };
 }
